@@ -1,1 +1,1 @@
-# tensorflow-dcgan
+# tensorflow-cDCGAN-mnist
