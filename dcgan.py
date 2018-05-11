@@ -83,7 +83,7 @@ class DCGAN(object):
 
         # discriminator
         self.D, self.D_logits = discriminator_mnist(self.inputs, self.y, reuse=False)
-        self.sampler = generator_mnist(self.z, self.y, reuse=True, flag_sampler=False)
+        self.sampler = generator_mnist(self.z, self.y, reuse=True, is_training=False)
         self.D_, self.D_logits_ = discriminator_mnist(self.G, self.y, reuse=True)
 
         self.d_sum = tf.summary.histogram("d", self.D)

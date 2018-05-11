@@ -101,13 +101,13 @@ def lrelu(x, leak=0.2):
     return tf.maximum(x, leak*x)
 
 
-def generator_mnist(z, y=None, reuse=False, flag_sampler=True):
+def generator_mnist(z, y=None, reuse=False, is_training=True):
     """
     Generator G(z,y)
     :param z:
     :param y:
     :param reuse:
-    :param flag_sampler: sampler function if true
+    :param is_training:
     :return:
     """
     with tf.variable_scope("Generator", reuse=reuse):
@@ -143,7 +143,7 @@ def generator_mnist(z, y=None, reuse=False, flag_sampler=True):
         num_hidden1 = gen_fc_dim
         w0 = tf.get_variable('w0', [z.get_shape()[1], num_hidden1], initializer=w_init)
         b0 = tf.get_variable('b0', [num_hidden1], initializer=b_init)
-        h0 = gen_bn0(tf.matmul(z, w0) + b0, train=flag_sampler)
+        h0 = gen_bn0(tf.matmul(z, w0) + b0, train=is_training)
         h0 = tf.nn.relu(h0)
         h0 = tf.concat([h0, y], 1)
 
@@ -151,14 +151,14 @@ def generator_mnist(z, y=None, reuse=False, flag_sampler=True):
         num_hidden2 = gen_conv_dim * 2 * s_h4 * s_w4
         w1 = tf.get_variable('w1', [h0.get_shape()[1], num_hidden2], initializer=w_init)
         b1 = tf.get_variable('b1', [num_hidden2], initializer=b_init)
-        h1 = gen_bn1(tf.matmul(h0, w1) + b1, train=flag_sampler)
+        h1 = gen_bn1(tf.matmul(h0, w1) + b1, train=is_training)
         h1 = tf.nn.relu(h1)
         h1 = tf.reshape(h1, [batch_size, s_h4, s_w4, gen_conv_dim * 2])
         h1 = conv_cond_concat(h1, yb)
 
         # 3rd layer (conv)
         h2 = deconv2d(h1, [batch_size, s_h2, s_w2, gen_conv_dim * 2], name='g_h2')
-        h2 = gen_bn2(h2, train=flag_sampler)
+        h2 = gen_bn2(h2, train=is_training)
         h2 = tf.nn.relu(h2)
         h2 = conv_cond_concat(h2, yb)
 
